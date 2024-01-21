@@ -16,7 +16,17 @@ const cadastrarUsuario = async (req, res) => { }
 const logarUsuario = async (req, res) => { }
 
 
-const listarCategorias = async (req, res) => { }
+const listarCategorias = async (req, res) => {
+
+    try {
+        const listarCategorias = await knex('categorias')
+
+        return res.status(200).json(listarCategorias)
+
+    } catch (error) {
+        return res.status(500).json({ mensagem: 'Erro Interno do Servidor' })
+    }
+};
 
 
 const detalharPerfil = async (req, res) => { }
