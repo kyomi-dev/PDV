@@ -12,7 +12,7 @@ const rotas = express();
 
 
 // listar as categorias do banco de dados
-rotas.get("/categorias", listarCategorias);
+rotas.get("/categoria", listarCategorias);
 
 // fazer o cadastro do usuario
 rotas.post("/usuario", validarUsuario(schemaValidacao), cadastrarUsuario);
