@@ -51,7 +51,7 @@ const logarUsuario = async (req, res) => {
         return res.status(200).json({ mensagem: usuarioLogado, token: tokenLogin });
 
     } catch (error) {
-        return res.status(400).json({ mensagem:error.message});
+        return res.status(400).json({ mensagem: error.message });
     }
 };
 
