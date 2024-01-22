@@ -6,7 +6,7 @@ const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editar
 const { validarUsuario } = require("../middlewares/validarUsuario");
 const schemaValidacao = require("../validacoes/schemaValidacao");
 const validarToken = require("../middlewares/validarToken");
-const { validarLogin}  = require("../middlewares/validarLogin");
+const { validarLogin } = require("../middlewares/validarLogin");
 
 const rotas = express();
 
@@ -21,10 +21,10 @@ rotas.post("/usuario", validarUsuario(schemaValidacao), cadastrarUsuario);
 rotas.post("/login", validarLogin, logarUsuario);
 
 // detalhar perfil do usuario
-rotas.get("/usuario/:id", validarToken, detalharPerfil);
+rotas.get("/usuario", validarToken, detalharPerfil);
 
 // editar perfil do usuario
-rotas.put("/usuario/:id", validarToken, editarPerfil);
+rotas.put("/usuario", validarToken, editarPerfil);
 
 
 module.exports = rotas; 
