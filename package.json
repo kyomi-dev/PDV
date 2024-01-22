@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "nodemon index.js"
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -13,5 +13,12 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
-  }
+  },
+  "name": "desafio-backend-modulo-05-sistema-pdv-dds13-dbe04",
+  "description": "![](https://i.imgur.com/xG74tOh.png)",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
