@@ -69,10 +69,10 @@ const listarCategorias = async (req, res) => {
 };
 
 const detalharPerfil = async (req, res) => {
-    const { id } = req.params;
+    const [{ id }] = req.usuario;
 
     try {
-        const usuario = await knex('usuarios').where({ id }).select('id', 'nome', 'email').first();
+        const usuario = await knex('usuarios').where({ id }).select("id", "nome", "email");
 
         if (!usuario) {
             return res.status(404).json({ mensagem: 'Usuário não encontrado.' })
@@ -81,15 +81,14 @@ const detalharPerfil = async (req, res) => {
         return res.json(usuario);
 
     } catch (error) {
-        return res.status(500).json({ mensagem: "Erro interno do servidor" });
-    }
-
+        return res.status(500).json({ mensagem: "Erro interno do servidor." })
+    };
 }
 
 const editarPerfil = async (req, res) => {
 
     const { nome, email, senha } = req.body;
-    const { id } = req.params;
+    const [{ id }] = req.usuario;
 
     try {
 
