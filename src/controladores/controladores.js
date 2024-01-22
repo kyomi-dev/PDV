@@ -8,7 +8,36 @@ const { criarToken } = require("../middlewares/criarToken");
 
 // só completem o controlador de vocês
 // implemente o middleware de validarUsuario.js e o schemaValidacao
-const cadastrarUsuario = async (req, res) => { }
+const cadastrarUsuario = async (req, res) => {
+    const { nome, email, senha } = req.body;
+
+    try {
+
+        const verificarEmail = await knex("usuarios").where({ email }).first();
+
+        if (verificarEmail) {
+            return res.status(400).json({ mensagem: "Esse email já existe." });
+        };
+
+        const senhaCriptografada = await bcrypt.hash(senha, 10);
+
+        const cadastroUsuario = await knex("usuarios")
+            .insert({
+                nome,
+                email,
+                senha: senhaCriptografada
+            }).returning("*");
+
+        if (!cadastroUsuario[0]) {
+            return res.status(400).json({ mensagem: "Usuário não cadastrado." })
+        }
+
+        return res.status(200).json(cadastroUsuario[0])
+
+    } catch (error) {
+        return res.status(500).json(error.message);
+    }
+};
 
 
 // o responsável pelo login deverá escrever o código dos middlewares
