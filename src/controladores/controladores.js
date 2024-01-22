@@ -61,7 +61,42 @@ const listarCategorias = async (req, res) => {
 const detalharPerfil = async (req, res) => { }
 
 
-const editarPerfil = async (req, res) => { }
+const editarPerfil = async (req, res) => {
+
+    const { nome, email, senha } = req.body;
+    const { id } = req.params;
+
+    try {
+
+        if (!nome || !email || !senha) {
+            return res.status(400).json({ mensagem: "Campos Obrigatórios não preenchidos" })
+        }
+
+        const verificarEmail = await knex("usuarios").where({ email }).first();
+
+        if (verificarEmail) {
+            return res.status(400).json({ mensagem: "Esse email já existe." });
+        };
+
+        const senhaCriptografada = await bcrypt.hash(senha, 10);
+
+        const editarPerfil = await knex("usuarios").where({ id })
+            .update({
+                nome,
+                email,
+                senha: senhaCriptografada
+            }).returning("*");
+
+        if (!editarPerfil) {
+            return res.status(400).json({ mensagem: "Não foi possível editar o usuário." });
+        }
+
+        return res.status(200).json({ mensagem: "Usuário atualizado com sucesso." });
+
+    } catch (error) {
+        res.status(500).json({ mensagem: "Erro interno do servidor." });
+    }
+}
 
 
 module.exports = { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil }
