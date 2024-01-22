@@ -42,7 +42,18 @@ const cadastrarUsuario = async (req, res) => {
 
 // o responsável pelo login deverá escrever o código dos middlewares
 // de criarToken, validarToken, validarLogin
-const logarUsuario = async (req, res) => { }
+const logarUsuario = async (req, res) => {
+    try {
+        const usuario = req.usuario;
+        const tokenLogin = await criarToken(usuario.id)
+        const { senha: _, ...usuarioLogado } = usuario;
+
+        return res.status(200).json({ mensagem: usuarioLogado, token: tokenLogin });
+
+    } catch (error) {
+        return res.status(400).json({ mensagem:error.message});
+    }
+};
 
 
 const listarCategorias = async (req, res) => {
