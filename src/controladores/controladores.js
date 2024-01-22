@@ -45,10 +45,7 @@ const cadastrarUsuario = async (req, res) => {
 const logarUsuario = async (req, res) => {
     try {
         const usuario = req.usuario;
-        console.log(usuario);
-
         const tokenLogin = await criarToken(usuario.id)
-        console.log(tokenLogin);
         const { senha: _, ...usuarioLogado } = usuario;
 
         return res.status(200).json({ mensagem: usuarioLogado, token: tokenLogin });

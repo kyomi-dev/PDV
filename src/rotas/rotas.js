@@ -3,10 +3,10 @@ const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editar
 
 
 // ---------- Middlewares ----------
-const validarUsuario = require("../middlewares/validarUsuario");
+const { validarUsuario } = require("../middlewares/validarUsuario");
 const schemaValidacao = require("../validacoes/schemaValidacao");
 const validarToken = require("../middlewares/validarToken");
-const validarLogin = require("../middlewares/validarLogin");
+const { validarLogin}  = require("../middlewares/validarLogin");
 
 const rotas = express();
 
