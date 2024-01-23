@@ -1,5 +1,5 @@
 const express = require("express");
-const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil, cadastrarProduto, cadastrarCliente } = require("../controladores/controladores");
+const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil, cadastrarProduto, cadastrarCliente, listarProdutos, listarClientes } = require("../controladores/controladores");
 
 
 // ---------- Middlewares ----------
@@ -31,5 +31,11 @@ rotas.post("/produto", validarToken, cadastrarProduto);
 
 // cadastrar cliente
 rotas.post("/cliente", validarToken, cadastrarCliente);
+
+// listar os produtos do banco de dados
+rotas.get("/produto", validarToken, listarProdutos);
+
+//listar os clientes do banco de dados
+rotas.get("/cliente", validarToken, listarClientes);
 
 module.exports = rotas; 
