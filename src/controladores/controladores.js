@@ -122,5 +122,47 @@ const editarPerfil = async (req, res) => {
     }
 }
 
+const cadastrarProduto = async (req, res) => {
+    const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
+    if (!descricao || !quantidade_estoque || !valor || !categoria_id) {
+        return res.json({ mensagem: "Todos os campos são obrigatórios." }).status(400);
+    }
 
-module.exports = { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil }
+    try {
+        const categoria = await knex("categorias").where("id", categoria_id).first();
+
+        if (categoria) {
+            if (valor * 100 > 2147483647) {
+                return res.json({ mensagem: "O valor deve ser menor ou igual a 21474836.47 no campo 'valor'" }).stauts(400);
+            }
+
+            const produto = await knex("produtos").insert({
+                descricao,
+                quantidade_estoque,
+                valor: valor * 100,
+                categoria_id
+            }).returning("*");
+
+            if (produto) {
+                return res.json({ mensagem: "O produto foi criado." }).status(201);
+            }
+        }
+
+        else {
+            return res.json({ mensagem: "A categoria não existe" }).status(404);
+        }
+
+    } catch (error) {
+        return res.json({ mensagem: "Erro interno do servidor." }).status(500);
+    }
+}
+
+
+module.exports = {
+    cadastrarUsuario,
+    logarUsuario,
+    listarCategorias,
+    detalharPerfil,
+    editarPerfil,
+    cadastrarProduto
+}
