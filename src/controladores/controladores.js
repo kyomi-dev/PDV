@@ -199,6 +199,30 @@ const cadastrarCliente = async (req, res) => {
     }
 };
 
+const listarProdutos = async (req, res) => {
+
+    try {
+        const listarProdutos = await knex('produtos');
+
+        return res.status(200).json(listarProdutos)
+
+    } catch (error) {
+        return res.status(500).json({ mensagem: 'Erro Interno do Servidor' })
+    }
+};
+
+const listarClientes = async (req, res) => {
+
+    try {
+        const listarClientes = await knex('clientes')
+
+        return res.status(200).json(listarClientes)
+
+    } catch (error) {
+        return res.status(500).json({ mensagem: 'Erro Interno do Servidor' })
+    }
+};
+
 module.exports = {
     cadastrarUsuario,
     logarUsuario,
@@ -206,5 +230,7 @@ module.exports = {
     detalharPerfil,
     editarPerfil,
     cadastrarProduto,
-    cadastrarCliente
+    cadastrarCliente,
+    listarProdutos,
+    listarClientes
 }
