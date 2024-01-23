@@ -157,6 +157,47 @@ const cadastrarProduto = async (req, res) => {
     }
 }
 
+const cadastrarCliente = async (req, res) => {
+    const { nome, email, cpf, cep, rua, numero, bairro, cidade, estado } = req.body;
+
+    try {
+
+        if (!nome || !email || !cpf) {
+            return res.status(400).json({ mensagem: "Os campos nome, email e cpf são obrigatórios" })
+        }
+
+
+        const verificarCPF = await knex("clientes").where({ cpf }).first();
+        const verificarEmail = await knex("clientes").where({ email }).first();
+
+
+        if (verificarCPF || verificarEmail) {
+            return res.status(400).json({ mensagem: "Esse email/cpf já existe." });
+        };
+
+        const cadastroCliente = await knex("clientes")
+            .insert({
+                nome,
+                email,
+                cpf,
+                cep,
+                rua,
+                numero,
+                bairro,
+                cidade,
+                estado
+            }).returning("*");
+
+        if (!cadastroCliente[0]) {
+            return res.status(400).json({ mensagem: "Cliente não cadastrado." })
+        }
+
+        return res.status(200).json(cadastroCliente[0])
+
+    } catch (error) {
+        return res.status(500).json(error.message);
+    }
+};
 
 module.exports = {
     cadastrarUsuario,
@@ -164,5 +205,6 @@ module.exports = {
     listarCategorias,
     detalharPerfil,
     editarPerfil,
-    cadastrarProduto
+    cadastrarProduto,
+    cadastrarCliente
 }
