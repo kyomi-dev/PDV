@@ -7,7 +7,7 @@ const { validarRequsicao } = require("../middlewares/validarRequisicao");
 const schemaValidacao = require("../validacoes/schemaValidacao");
 const validarToken = require("../middlewares/validarToken");
 const { validarLogin } = require("../middlewares/validarLogin");
-//const schemaValidacaoProduto = require("../validacoes/schemaValiacaoProduto");
+const schemaValidacaoProduto = require("../validacoes/schemaValiacaoProduto");
 
 const rotas = express();
 
@@ -42,7 +42,7 @@ rotas.delete("/produto/:id", validarToken, excluirProduto)
 //listar os clientes do banco de dados
 rotas.get("/cliente", validarToken, listarClientes);
 
-//rotas.put("/produto/:id", validarToken, validarRequsicao(schemaValidacaoProduto), editarProduto);
+rotas.put("/produto/:id", validarToken, validarRequsicao(schemaValidacaoProduto), editarProduto);
 
 
 
