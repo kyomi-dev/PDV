@@ -46,4 +46,6 @@ rotas.get("/cliente", validarToken, listarClientes);
 
 
 
+
+
 module.exports = rotas; 
