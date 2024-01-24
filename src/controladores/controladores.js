@@ -228,7 +228,6 @@ const listarProdutos = async (req, res) => {
 
         if (categoria_id) {
             const listarProdutos = await knex("produtos").where({ categoria_id });
-            console.log(listarProdutos)
             return res.status(200).json(listarProdutos)
         }
 
