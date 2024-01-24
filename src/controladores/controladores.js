@@ -223,6 +223,33 @@ const listarClientes = async (req, res) => {
     }
 };
 
+const editarProduto = async (req, res) => {
+    const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
+    const produtoId = req.params.id;
+
+    try {
+
+        const produtoExiste = await knex("produtos").where("id", produtoId).first();
+
+        if (!produtoExiste) {
+            return res.status(404).json({ mensagem: "Esse produto não existe" });
+        }
+        const atualizarProduto = await knex("produtos").where("id", produtoId)
+            .update({
+                descricao,
+                quantidade_estoque,
+                valor,
+                categoria_id,
+            }).returning("*");
+
+
+        return res.status(200).json(atualizarProduto);
+
+    } catch (error) {
+        console.error(error);
+    };
+};
+
 module.exports = {
     cadastrarUsuario,
     logarUsuario,
@@ -232,5 +259,6 @@ module.exports = {
     cadastrarProduto,
     cadastrarCliente,
     listarProdutos,
-    listarClientes
+    listarClientes,
+    editarProduto
 }
