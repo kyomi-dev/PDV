@@ -222,11 +222,21 @@ const cadastrarCliente = async (req, res) => {
 };
 
 const listarProdutos = async (req, res) => {
+    const { categoria_id } = req.query;
 
     try {
-        const listarProdutos = await knex('produtos');
 
-        return res.status(200).json(listarProdutos)
+        if (categoria_id) {
+            const listarProdutos = await knex("produtos").where({ categoria_id });
+            console.log(listarProdutos)
+            return res.status(200).json(listarProdutos)
+        }
+
+        else {
+            const produtos = await knex("produtos");
+            return res.status(200).json(produtos)
+        }
+
 
     } catch (error) {
         return res.status(500).json({ mensagem: 'Erro Interno do Servidor' })
