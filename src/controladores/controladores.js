@@ -281,6 +281,41 @@ const editarProduto = async (req, res) => {
     };
 };
 
+const detalharProduto = async (req, res) => { 
+    const produtoId = req.params.id;
+   
+    try {
+    const produto = await knex('produtos').where("id", produtoId);
+       
+    if (produto.length===0) {
+    return res.status(404).json({ mensagem: "Produto não encontrado." })
+           }
+   
+    return res.status(200).json(produto);
+   
+       } catch (error) {
+    return res.status(500).json({ mensagem: "Erro interno do servidor." })
+       };
+   };
+   
+   
+   const detalharCliente = async (req, res) => { 
+    const clienteId = req.params.id;
+   
+    try {
+    const cliente = await knex('clientes').where( "id", clienteId).select("id", "nome", "email", "cpf", "cep", "rua", "numero", "bairro", "cidade", "estado");
+   
+    if (cliente.length===0) {
+    return res.status(404).json({ mensagem: 'Cliente não encontrado.' })
+           }
+   
+    return res.status(200).json(cliente);
+   
+       } catch (error) {
+    return res.status(500).json({ mensagem: "Erro interno do servidor." })
+       };
+   };
+
 module.exports = {
     cadastrarUsuario,
     logarUsuario,
@@ -292,6 +327,7 @@ module.exports = {
     cadastrarCliente,
     listarProdutos,
     listarClientes,
-    editarProduto
-
+    editarProduto,
+    detalharCliente,
+    detalharProduto
 }
