@@ -1,12 +1,13 @@
 const express = require("express");
-const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil, cadastrarProduto, cadastrarCliente, listarProdutos, listarClientes } = require("../controladores/controladores");
+const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil, cadastrarProduto, cadastrarCliente, listarProdutos, listarClientes, editarProduto } = require("../controladores/controladores");
 
 
 // ---------- Middlewares ----------
-const { validarUsuario } = require("../middlewares/validarUsuario");
+const { validarRequsicao } = require("../middlewares/validarRequisicao");
 const schemaValidacao = require("../validacoes/schemaValidacao");
 const validarToken = require("../middlewares/validarToken");
 const { validarLogin } = require("../middlewares/validarLogin");
+const schemaValidacaoProduto = require("../validacoes/schemaValiacaoProduto");
 
 const rotas = express();
 
@@ -15,7 +16,7 @@ const rotas = express();
 rotas.get("/categoria", listarCategorias);
 
 // fazer o cadastro do usuario
-rotas.post("/usuario", validarUsuario(schemaValidacao), cadastrarUsuario);
+rotas.post("/usuario", validarRequsicao(schemaValidacao), cadastrarUsuario);
 
 // fazer o login do usuario
 rotas.post("/login", validarLogin, logarUsuario);
@@ -37,5 +38,7 @@ rotas.get("/produto", validarToken, listarProdutos);
 
 //listar os clientes do banco de dados
 rotas.get("/cliente", validarToken, listarClientes);
+
+rotas.put("/produto/:id", validarToken, validarRequsicao(schemaValidacaoProduto), editarProduto);
 
 module.exports = rotas; 
