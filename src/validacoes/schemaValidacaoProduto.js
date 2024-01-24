@@ -21,7 +21,7 @@ const schemaValidacaoProduto = joi.object({
         "number.positive": "O campo valor precisa ser um número positivo"
     }),
 
-    categoria_id: joi.string().required().messages({
+    categoria_id: joi.number().integer().required().messages({
         "any.required": "O campo descrição é obrigatório",
         "string.empty": "O campo descrição é obrigatório"
     })
