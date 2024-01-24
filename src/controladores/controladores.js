@@ -156,6 +156,28 @@ const cadastrarProduto = async (req, res) => {
         return res.json({ mensagem: "Erro interno do servidor." }).status(500);
     }
 }
+// Aqui
+const excluirProduto = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        // Validar produto existe
+        const produtoExiste = await knex('produtos').where({ id }).first()
+        if (!produtoExiste) {
+            return res.status(404).json({ mensagem: 'Produto não encontrado.' })
+        }
+
+        // Excluir produto
+        await knex('produtos').where({ id }).delete();
+
+        // Retornar mensagem de sucesso
+        res.status(200).json({ mensagem: 'Produto excluído com sucesso.' });
+    } catch (error) {
+        console.log(error)
+        return res.status(202).json({ mensagem: 'Erro no Servidor.' })
+    }
+}
+
 
 const cadastrarCliente = async (req, res) => {
     const { nome, email, cpf, cep, rua, numero, bairro, cidade, estado } = req.body;
@@ -257,8 +279,10 @@ module.exports = {
     detalharPerfil,
     editarPerfil,
     cadastrarProduto,
+    excluirProduto,
     cadastrarCliente,
     listarProdutos,
     listarClientes,
     editarProduto
+
 }
