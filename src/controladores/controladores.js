@@ -365,6 +365,78 @@ const editarDadosDoCliente = async (req, res) => {
     }
 }
 
+
+const cadastrarPedido = async (req, res) => {
+    const { cliente_id, observacao, pedido_produtos } = req.body;
+
+    try {
+
+        if (!cliente_id || !pedido_produtos || !pedido_produtos[0].produto_id || !pedido_produtos[0].quantidade_produto) {
+            return res.status(400).json({ mensagem: "Os campos cliente_id, pedido_produtos, produto_id, quantidade_produto são obrigatórios" })
+        }
+
+        const clienteCadastradoId = await knex('clientes').where("id", cliente_id).first();
+
+        if (!clienteCadastradoId) {
+            return res.status(400).json('Esse cliente não existe.')
+        }
+
+        for (i = 0; i < pedido_produtos.length; i++) {
+
+            const produtoCadastradoId = await knex('produtos').where("id", pedido_produtos[i].produto_id).first();
+
+            if (!produtoCadastradoId) {
+                return res.status(400).json('Um ou mais produtos vinculados ao pedido não existe(m).')
+            }
+
+            const produtoQuantEstoque = await knex('produtos').where("id", pedido_produtos[i].produto_id).select('quantidade_estoque').first();
+            const { quantidade_estoque } = produtoQuantEstoque;
+
+            if (quantidade_estoque < pedido_produtos[i].quantidade_produto) {
+                return res.status(400).json("Não há itens suficientes no estoque para atender a este pedido.")
+            }
+
+        }
+
+        let valor_total = 0;
+
+        for (const item of pedido_produtos) {
+            const valorDoPedido = item.valor_produto * item.quantidade_produto;
+            valor_total = valor_total + valorDoPedido
+        }
+
+        const cadastroPedido = await knex("pedidos")
+            .insert({
+                cliente_id,
+                observacao,
+                valor_total
+            }).returning('*')
+
+        const pedidoID = (await knex('pedidos').select('id'));
+        const index = pedidoID.length;
+        const { id } = pedidoID[index - 1];
+
+        for (const pedidoProduto of pedido_produtos) {
+            await knex('pedido_produtos')
+                .insert({
+                    pedido_id: id,
+                    produto_id: pedidoProduto.produto_id,
+                    quantidade_produto: pedidoProduto.quantidade_produto,
+                    valor_produto: pedidoProduto.valor_produto
+                })
+        }
+
+        if (!cadastroPedido[0]) {
+            return res.status(400).json({ mensagem: "Pedido não cadastrado." })
+        }
+
+        return res.status(200).json(cadastroPedido[0])
+
+    } catch (error) {
+        return res.status(500).json(error.message);
+    }
+};
+
 module.exports = {
     cadastrarUsuario,
     logarUsuario,
@@ -379,5 +451,6 @@ module.exports = {
     editarProduto,
     detalharCliente,
     detalharProduto,
-    editarDadosDoCliente
+    editarDadosDoCliente,
+    cadastrarPedido
 }
