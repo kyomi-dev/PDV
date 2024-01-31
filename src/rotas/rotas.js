@@ -1,6 +1,6 @@
 const express = require("express");
 const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil, cadastrarProduto, cadastrarCliente,
-    listarProdutos, listarClientes, editarProduto, excluirProduto, detalharProduto, detalharCliente, editarDadosDoCliente } = require("../controladores/controladores");
+    listarProdutos, listarClientes, editarProduto, excluirProduto, detalharProduto, detalharCliente, editarDadosDoCliente, cadastrarPedido } = require("../controladores/controladores");
 
 
 // ---------- Middlewares ----------
@@ -53,5 +53,8 @@ rotas.get("/cliente/:id", validarToken, detalharCliente);
 
 // Editar Dados do Cliente
 rotas.put("/cliente/:id", validarToken, editarDadosDoCliente);
+
+// cadastrar pedido
+rotas.post("/pedido", validarToken, cadastrarPedido);
 
 module.exports = rotas; 
