@@ -365,6 +365,32 @@ const editarDadosDoCliente = async (req, res) => {
     }
 }
 
+const listarPedidos = async (req, res) => {
+    const { cliente_id } = req.query;
+
+    try {
+
+        if (cliente_id) {
+            const listarPedidos = await knex("pedidos").where({ cliente_id });
+            const listarPedidosProduto = await knex("pedido_produtos").where({ cliente_id });
+            const objListarPedido = { listarPedidos, listarPedidosProduto };
+            return res.status(200).json(objListarPedido);
+        }
+
+        else {
+            const pedidosProduto = await knex("pedido_produtos");
+            const pedidos = await knex("pedidos");
+            const objPedido = { pedidos, pedidosProduto };
+            return res.status(200).json(objPedido);
+        }
+
+
+    } catch (error) {
+        return res.status(500).json({ mensagem: 'Erro Interno do Servidor' })
+    }
+};
+
+
 module.exports = {
     cadastrarUsuario,
     logarUsuario,
@@ -379,5 +405,6 @@ module.exports = {
     editarProduto,
     detalharCliente,
     detalharProduto,
-    editarDadosDoCliente
+    editarDadosDoCliente,
+    listarPedidos
 }
