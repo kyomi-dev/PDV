@@ -2,6 +2,7 @@ const knex = require("../../conexao");
 const bcrypt = require("bcrypt");
 const { criarToken } = require("../middlewares/criarToken");
 const { error, id } = require("../validacoes/schemaValidacao");
+const { uploudImagem } = require("../middlewares/uploud");
 
 // PARA TODOS: se conectem ao banco de dados colando cada valor 
 // das variaveis no .env no beekeeper ou na extensão que vcs tao usando
@@ -55,7 +56,6 @@ const logarUsuario = async (req, res) => {
         return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 };
-
 
 const listarCategorias = async (req, res) => {
 
@@ -124,39 +124,62 @@ const editarPerfil = async (req, res) => {
 }
 
 const cadastrarProduto = async (req, res) => {
-    const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
-    if (!descricao || !quantidade_estoque || !valor || !categoria_id) {
-        return res.json({ mensagem: "Todos os campos são obrigatórios." }).status(400);
-    }
-
     try {
-        const categoria = await knex("categorias").where("id", categoria_id).first();
+        const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
+        const { originalname, mimetype, buffer } = req.file
 
-        if (categoria) {
-            if (valor * 100 > 2147483647) {
-                return res.json({ mensagem: "O valor deve ser menor ou igual a 21474836.47 no campo 'valor'" }).stauts(400);
-            }
-
-            const produto = await knex("produtos").insert({
-                descricao,
-                quantidade_estoque,
-                valor: valor * 100,
-                categoria_id
-            }).returning("*");
-
-            if (produto) {
-                return res.json({ mensagem: "O produto foi criado." }).status(201);
-            }
+        // Validar campos obrigatórios
+        if (!descricao || !quantidade_estoque || !valor || !categoria_id) {
+            return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
         }
 
-        else {
-            return res.json({ mensagem: "A categoria não existe" }).status(404);
+        // Validar categoria
+        const categoriaExiste = await knex('categorias').where({ id: categoria_id }).first();
+        if (!categoriaExiste) {
+            return res.status(400).json({ mensagem: 'Categoria não encontrada.' });
         }
+
+        // // Verificar se o produto já existe
+        // const produtoExiste = await knex('produtos').where({ descricao, categoria_id }).first();
+
+
+        // // Se o produto não existir, inserir
+        // if (!produtoExiste) {
+
+        let produtoNovo = await knex('produtos').insert({
+            descricao,
+            quantidade_estoque,
+            valor,
+            categoria_id
+        }).returning('*');
+
+        const idProdutoNovo = produtoNovo[0].id
+        // Imagem
+        const produto_imagem = await uploudImagem(
+            `produtos/${idProdutoNovo}/${originalname}`,
+            buffer,
+            mimetype
+        )
+
+        await knex('produtos').update({
+            produto_imagem: produto_imagem.url
+        }).where({ id: idProdutoNovo })
+
+        const produtoNovoComImagem = await knex('produtos').where({ id: idProdutoNovo })
+        // Retornar produto criado
+        res.status(201).json(produtoNovoComImagem);
 
     } catch (error) {
-        return res.json({ mensagem: "Erro interno do servidor." }).status(500);
+        console.log(error);
+        return res.status(400).json({ mensagem: 'Erro no Servidor.' });
     }
-}
+};
+
+
+
+
+
+
 // Aqui
 const excluirProduto = async (req, res) => {
     try {
@@ -255,31 +278,58 @@ const listarClientes = async (req, res) => {
     }
 };
 
+
 const editarProduto = async (req, res) => {
-    const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
-    const produtoId = req.params.id;
-
     try {
+        const id = req.params.id;
+        const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
 
-        const produtoExiste = await knex("produtos").where("id", produtoId).first();
-
-        if (!produtoExiste) {
-            return res.status(404).json({ mensagem: "Esse produto não existe" });
+        // Validar campos obrigatórios
+        if (!descricao || !quantidade_estoque || !valor || !categoria_id) {
+            return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
         }
-        const atualizarProduto = await knex("produtos").where("id", produtoId)
-            .update({
-                descricao,
-                quantidade_estoque,
-                valor,
-                categoria_id,
-            }).returning("*");
 
+        // O Produto
+        const produtoExiste = await knex('produtos').where({ id }).first();
 
-        return res.status(200).json(atualizarProduto);
+        // Validar categoria existe
+        const categoriaExiste = await knex('categorias').where({ id: categoria_id }).first();
+        if (!categoriaExiste) {
+            return res.status(400).json({ mensagem: 'Categoria não encontrada.' });
+        }
 
+        // Atualizar produto
+        const dados = {
+            descricao,
+            quantidade_estoque,
+            valor,
+            categoria_id,
+        };
+
+        // Verificar se há uma nova imagem
+        if (req.file) {
+            const { originalname, mimetype, buffer } = req.file;
+
+            // Imagem
+            const produto_imagem = await uploudImagem(
+                `produtos/${id}/${originalname}`,
+                buffer,
+                mimetype
+            );
+
+            dados.produto_imagem = produto_imagem.url;
+        }
+
+        await knex('produtos').where({ id }).update(dados);
+
+        const produtoEditado = await knex('produtos').where({ id: produtoExiste.id }).select('descricao', 'quantidade_estoque', 'valor', 'categoria_id', 'produto_imagem').first();
+
+        // Retornar produto atualizado
+        res.status(200).json(produtoEditado);
     } catch (error) {
-        console.error(error);
-    };
+        console.log(error);
+        return res.status(500).json({ mensagem: 'Erro no Servidor.' });
+    }
 };
 
 const detalharProduto = async (req, res) => {

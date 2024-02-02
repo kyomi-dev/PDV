@@ -8,7 +8,7 @@ const { validarRequsicao } = require("../middlewares/validarRequisicao");
 const schemaValidacao = require("../validacoes/schemaValidacao");
 const validarToken = require("../middlewares/validarToken");
 const { validarLogin } = require("../middlewares/validarLogin");
-const schemaValidacaoProduto = require("../validacoes/schemaValidacaoProduto");
+const multer = require("../middlewares/multer");
 
 const rotas = express();
 
@@ -29,7 +29,7 @@ rotas.get("/usuario", validarToken, detalharPerfil);
 rotas.put("/usuario", validarToken, editarPerfil);
 
 // cadastrar produto
-rotas.post("/produto", validarToken, cadastrarProduto);
+rotas.post("/produto", validarToken, multer.single('produto_imagem'), cadastrarProduto);
 
 // cadastrar cliente
 rotas.post("/cliente", validarToken, cadastrarCliente);
@@ -43,7 +43,7 @@ rotas.delete("/produto/:id", validarToken, excluirProduto)
 //listar os clientes do banco de dados
 rotas.get("/cliente", validarToken, listarClientes);
 
-rotas.put("/produto/:id", validarToken, validarRequsicao(schemaValidacaoProduto), editarProduto);
+rotas.put("/produto/:id", validarToken, multer.single('produto_imagem'), editarProduto);
 
 // Detalhar Produto
 rotas.get("/produto/:id", validarToken, detalharProduto);
