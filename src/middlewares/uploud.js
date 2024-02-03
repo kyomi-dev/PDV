@@ -10,7 +10,7 @@ const s3 = new aws.S3({
     }
 })
 
-const uploudImagem = async (path, buffer, mimetupe) => {
+const uploadImagem = async (path, buffer, mimetupe) => {
     const produto_imagem = await s3.upload({
         Bucket: process.env.AWS_keyName,
         Key: path,
@@ -28,6 +28,6 @@ const uploudImagem = async (path, buffer, mimetupe) => {
 
 
 module.exports = {
-    uploudImagem,
+    uploadImagem,
 
 }

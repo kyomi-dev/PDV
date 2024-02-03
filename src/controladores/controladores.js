@@ -2,7 +2,7 @@ const knex = require("../../conexao");
 const bcrypt = require("bcrypt");
 const { criarToken } = require("../middlewares/criarToken");
 const { error, id } = require("../validacoes/schemaValidacao");
-const { uploudImagem } = require("../middlewares/uploud");
+const { uploadImagem } = require("../middlewares/uploud");
 
 // PARA TODOS: se conectem ao banco de dados colando cada valor 
 // das variaveis no .env no beekeeper ou na extensão que vcs tao usando
@@ -126,7 +126,7 @@ const editarPerfil = async (req, res) => {
 const cadastrarProduto = async (req, res) => {
     try {
         const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
-        const { originalname, mimetype, buffer } = req.file
+
 
         // Validar campos obrigatórios
         if (!descricao || !quantidade_estoque || !valor || !categoria_id) {
@@ -139,35 +139,44 @@ const cadastrarProduto = async (req, res) => {
             return res.status(400).json({ mensagem: 'Categoria não encontrada.' });
         }
 
-        // // Verificar se o produto já existe
-        // const produtoExiste = await knex('produtos').where({ descricao, categoria_id }).first();
-
-
-        // // Se o produto não existir, inserir
-        // if (!produtoExiste) {
-
         let produtoNovo = await knex('produtos').insert({
             descricao,
             quantidade_estoque,
             valor,
             categoria_id
-        }).returning('*');
+        }).returning(`*`)
+
 
         const idProdutoNovo = produtoNovo[0].id
         // Imagem
-        const produto_imagem = await uploudImagem(
-            `produtos/${idProdutoNovo}/${originalname}`,
-            buffer,
-            mimetype
-        )
 
-        await knex('produtos').update({
-            produto_imagem: produto_imagem.url
-        }).where({ id: idProdutoNovo })
 
-        const produtoNovoComImagem = await knex('produtos').where({ id: idProdutoNovo })
-        // Retornar produto criado
-        res.status(201).json(produtoNovoComImagem);
+
+        // se a imagem for passada adiciona no banco de dados 
+        if (req.file) {
+            const { originalname, mimetype, buffer } = req.file
+            const produto_imagem = await uploadImagem(
+                `produtos/${idProdutoNovo}/${originalname}`,
+                buffer,
+                mimetype
+            )
+            await knex('produtos').update({
+                produto_imagem: produto_imagem.url
+            }).where({ id: idProdutoNovo })
+
+
+            const produtoNovoComImagem = await knex('produtos').where({ id: idProdutoNovo })
+            // Retornar produto criado
+
+            return res.status(201).json(produtoNovoComImagem);
+        }
+
+        else {
+            const produtoNovo = await knex('produtos').where({ id: idProdutoNovo }).select('id', 'descricao', 'quantidade_estoque', 'valor', 'categoria_id')
+
+            return res.status(201).json(produtoNovo);
+        }
+
 
     } catch (error) {
         console.log(error);
@@ -175,12 +184,6 @@ const cadastrarProduto = async (req, res) => {
     }
 };
 
-
-
-
-
-
-// Aqui
 const excluirProduto = async (req, res) => {
     try {
         const id = req.params.id;
@@ -201,7 +204,6 @@ const excluirProduto = async (req, res) => {
         return res.status(202).json({ mensagem: 'Erro no Servidor.' })
     }
 }
-
 
 const cadastrarCliente = async (req, res) => {
     const { nome, email, cpf, cep, rua, numero, bairro, cidade, estado } = req.body;
@@ -311,7 +313,7 @@ const editarProduto = async (req, res) => {
             const { originalname, mimetype, buffer } = req.file;
 
             // Imagem
-            const produto_imagem = await uploudImagem(
+            const produto_imagem = await uploadImagem(
                 `produtos/${id}/${originalname}`,
                 buffer,
                 mimetype
