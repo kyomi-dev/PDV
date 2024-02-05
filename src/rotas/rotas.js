@@ -1,6 +1,6 @@
 const express = require("express");
 const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil, cadastrarProduto, cadastrarCliente,
-    listarProdutos, listarClientes, editarProduto, excluirProduto, detalharProduto, detalharCliente, editarDadosDoCliente, listarPedidos, cadastrarPedido } = require("../controladores/controladores");
+    listarProdutos, listarClientes, editarProduto, excluirProduto, detalharProduto, detalharCliente, editarDadosDoCliente, cadastrarPedido, listarPedidos } = require("../controladores/controladores");
 
 
 // ---------- Middlewares ----------
