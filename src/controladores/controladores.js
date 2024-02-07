@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { criarToken } = require("../middlewares/criarToken");
 const { error, id } = require("../validacoes/schemaValidacao");
 const { uploadImagem } = require("../middlewares/uploud");
+const sendMail = require('../email');
 
 // PARA TODOS: se conectem ao banco de dados colando cada valor 
 // das variaveis no .env no beekeeper ou na extensão que vcs tao usando
@@ -494,14 +495,19 @@ const cadastrarPedido = async (req, res) => {
             return res.status(400).json({ mensagem: "Pedido não cadastrado." })
         }
 
-        return res.status(200).json(cadastroPedido[0])
+        const cliente = await knex('clientes').where({ id: cliente_id }).first();
 
+        if (!cliente) {
+            return res.status(400).json({ mensagem: 'Cliente não encontrado.' });
+        }
+
+        await sendMail(cliente.email, cliente.nome);
+
+        return res.status(200).json(cadastroPedido[0]);
     } catch (error) {
         return res.status(500).json(error.message);
     }
 };
-
-
 
 const listarPedidos = async (req, res) => {
     const { cliente_id } = req.query;
