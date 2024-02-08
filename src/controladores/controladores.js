@@ -2,7 +2,7 @@ const knex = require("../../conexao");
 const bcrypt = require("bcrypt");
 const { criarToken } = require("../middlewares/criarToken");
 const { error, id } = require("../validacoes/schemaValidacao");
-const { uploadImagem } = require("../middlewares/uploud");
+const { uploadImagem, excluirImagem } = require("../middlewares/uploud");
 const sendMail = require('../email');
 
 // PARA TODOS: se conectem ao banco de dados colando cada valor 
@@ -201,6 +201,8 @@ const excluirProduto = async (req, res) => {
         }
 
         // Excluir produto
+        await excluirImagem(produtoExiste.produto_imagem);
+
         await knex('produtos').where({ id }).delete();
 
         // Retornar mensagem de sucesso
@@ -209,6 +211,36 @@ const excluirProduto = async (req, res) => {
         console.log(error)
         return res.status(202).json({ mensagem: 'Erro no Servidor.' })
     }
+}
+
+const excluirImagemProduto = async (req, res) => {
+
+    try {
+        const id = req.params.id;
+
+        // Validar produto existe
+        const produtoExiste = await knex('produtos').where({ id }).first()
+        if (!produtoExiste) {
+            return res.status(404).json({ mensagem: 'Produto não encontrado.' })
+        }
+
+        await excluirImagem(produtoExiste.produto_imagem);
+
+        const produtoImagem = await knex("produtos")
+            .where({ id })
+            .update({
+                produto_imagem: null
+            });
+
+        if (!produtoImagem) {
+            return res.status(400).json({ mensagem: "Produto não foi excluído" });
+
+        }
+        return res.status(200).json({ mensagem: "Imagem excluída" })
+    } catch (error) {
+        return res.status(400).json({ mensagem: "Erro interno do servidor" });
+
+    };
 }
 
 const cadastrarCliente = async (req, res) => {
@@ -552,6 +584,7 @@ module.exports = {
     detalharProduto,
     editarDadosDoCliente,
     cadastrarPedido,
-    listarPedidos
+    listarPedidos,
+    excluirImagemProduto
 
 }
