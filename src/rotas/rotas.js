@@ -1,6 +1,6 @@
 const express = require("express");
 const { cadastrarUsuario, logarUsuario, listarCategorias, detalharPerfil, editarPerfil, cadastrarProduto, cadastrarCliente,
-    listarProdutos, listarClientes, editarProduto, excluirProduto, detalharProduto, detalharCliente, editarDadosDoCliente, cadastrarPedido, listarPedidos } = require("../controladores/controladores");
+    listarProdutos, listarClientes, editarProduto, excluirProduto, detalharProduto, detalharCliente, editarDadosDoCliente, cadastrarPedido, listarPedidos, excluirImagemProduto } = require("../controladores/controladores");
 
 
 // ---------- Middlewares ----------
@@ -39,6 +39,9 @@ rotas.get("/produto", validarToken, listarProdutos);
 
 // Excluir produto do banco de dados
 rotas.delete("/produto/:id", validarToken, excluirProduto)
+
+// Excluir imagem do produto
+rotas.delete("/produto/:id/imagem", validarToken, excluirImagemProduto);
 
 //listar os clientes do banco de dados
 rotas.get("/cliente", validarToken, listarClientes);
