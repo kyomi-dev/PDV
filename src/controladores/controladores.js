@@ -180,7 +180,6 @@ const cadastrarProduto = async (req, res) => {
 
 
     } catch (error) {
-        console.log(error);
         return res.status(400).json({ mensagem: 'Erro no Servidor.' });
     }
 };
@@ -208,7 +207,6 @@ const excluirProduto = async (req, res) => {
         // Retornar mensagem de sucesso
         res.status(200).json({ mensagem: 'Produto excluído com sucesso.' });
     } catch (error) {
-        console.log(error)
         return res.status(202).json({ mensagem: 'Erro no Servidor.' })
     }
 }
@@ -367,7 +365,6 @@ const editarProduto = async (req, res) => {
         // Retornar produto atualizado
         res.status(200).json(produtoEditado);
     } catch (error) {
-        console.log(error);
         return res.status(500).json({ mensagem: 'Erro no Servidor.' });
     }
 };
