@@ -23,11 +23,22 @@ const uploadImagem = async (path, buffer, mimetupe) => {
         path: produto_imagem.Key,
         url: `https://${process.env.AWS_keyName}.${process.env.AWS_Endpoint}/${produto_imagem.Key}`
     }
+
+
 }
+
+const excluirImagem = async (path) => {
+    await s3.deleteObject({
+        Bucket: process.env.AWS_keyName,
+        Key: path
+    }).promise();
+}
+
+
 
 
 
 module.exports = {
     uploadImagem,
-
+    excluirImagem
 }
